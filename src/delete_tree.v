@@ -62,6 +62,15 @@ Theorem wp_delete_tree t :
     delete_tree #t
   {{{ RET #(); emp }}}.
 Proof.
+
+  (* First we should understand how Hoare logic proofs are encoded in Iris. In
+  the course infrastructure the goal is always a triple (a proc_spec goal). In
+  Iris the goal is going to be [WP e {{ Q }}], which is a separation logic
+  predicate, not a Coq assertion. For intuition, keep in mind that {{P}} e {{Q}}
+  is the same thing as P ⊢ WP e {{ Q }}. Then, you can think of the spec being
+  proven as one where the precondition is all of the premises (the hypotheses)
+  and the program and postcondition are in the goal. *)
+
   (* this is how we start a recursive proof: *)
   iLöb as "IH" forall (t).
   iIntros (Φ) "Ht HΦ".
