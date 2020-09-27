@@ -32,7 +32,6 @@ Proof.
   wp_alloc t as "Ht".
   iApply "HΦ".
   rewrite tree_unfold.
-  iExists _; iFrame.
   iLeft; done.
 Qed.
 
@@ -42,7 +41,6 @@ Lemma tree_combine_some t l r :
 Proof.
   iIntros "(Ht & Hl & Hr)".
   iApply tree_unfold.
-  iExists _; iFrame.
   iRight.
   iExists l, r; iFrame; done.
 Qed.
@@ -54,11 +52,8 @@ Theorem wp_expand_right t :
 Proof.
   iLöb as "IH" forall (t).
   iIntros (Φ) "Ht HΦ".
-  iDestruct (tree_unfold with "Ht") as (p) "[Hp Hpval]".
-  wp_rec.
-  wp_load.
-  iDestruct "Hpval" as "[-> | Hsubtrees]".
-  - wp_pures.
+  iDestruct (tree_unfold with "Ht") as "[Hp|Hp]"; wp_rec.
+  - wp_load; wp_pures.
     wp_apply (wp_mk_empty_tree with "[//]").
     iIntros (r) "Hr".
     wp_apply (wp_mk_empty_tree with "[//]").
@@ -66,12 +61,12 @@ Proof.
     wp_store.
     iApply "HΦ".
     iApply (tree_combine_some with "[$Hp $Hl $Hr]").
-  - iDestruct "Hsubtrees" as (l r) "(-> & Hl & Hr)".
-    wp_pures.
-    iApply ("IH" with "Hr").
-    iIntros "!> Hr".
+  - iDestruct "Hp" as (l r) "(Hp & Hleft & Hright)".
+    wp_load; wp_pures.
+    iApply ("IH" with "Hright").
+    iIntros "!> Hright".
     iApply "HΦ".
-    iApply (tree_combine_some with "[$Hp $Hl $Hr]").
+    iApply (tree_combine_some with "[$Hp $Hleft $Hright]").
 Qed.
 
 End proof.

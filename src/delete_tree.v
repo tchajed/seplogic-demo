@@ -1,7 +1,7 @@
 From iris.heap_lang Require Export proofmode notation.
 
-Set Default Goal Selector "!".
-Set Default Proof Using "Type".
+Export Set Default Goal Selector "!".
+Export Set Default Proof Using "Type".
 
 (** * deletetree from the Separation Logic CACM paper by O'Hearn *)
 
@@ -38,8 +38,7 @@ Implicit Types (t l r:loc).
 (* You can ignore some magic that creates the recursive tree predicate... *)
 
 Definition tree_pre (tree: loc -d> iPropO Σ): loc -d> iPropO Σ :=
-  (λ t, ∃ p, t ↦ p ∗
-        (⌜p = InjLV #()⌝ ∨ ∃ l r, ⌜p = InjRV (#l, #r)⌝ ∗ ▷ tree l ∗ ▷ tree r))%I.
+  (λ t, t ↦ InjLV #() ∨ (∃ l r, t ↦ InjRV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r))%I.
 
 Local Instance tree_pre_contractive : Contractive tree_pre.
 Proof.
@@ -50,11 +49,12 @@ Qed.
 Definition tree : loc → iProp Σ := fixpoint tree_pre.
 
 (** Following the fixpoint magic above, the definition [tree] ends up being the
-recursive definition we expect (the ⊣⊢ means "equivalent"): *)
+recursive definition we expect (the ⊣⊢ means "equivalent"). You can pretend ▷P
+is the same as P; it's a technically related to writing recursive predicates in
+Iris. *)
 Theorem tree_unfold t :
   tree t ⊣⊢
-  ∃ p, t ↦ p ∗
-       (⌜p = InjLV #()⌝ ∨ ∃ l r, ⌜p = InjRV (#l, #r)⌝ ∗ ▷ tree l ∗ ▷ tree r).
+  t ↦ InjLV #() ∨ (∃ l r, t ↦ InjRV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r).
 Proof. apply (fixpoint_unfold tree_pre). Qed.
 
 Theorem wp_delete_tree t :
@@ -73,28 +73,25 @@ Proof.
   can't be used to just dismiss the whole proof (otherwise proofs would be easy
   but not very meaningful) *)
 
-  (* first, we need to destruct [tree] to learn the basic structure: a tree is
-  always a pointer, either to nothing or to a pair of children. *)
-  iDestruct (tree_unfold with "Ht") as (p) "[Hp Hpval]".
-  wp_rec.
-  wp_load.
-  (* the main structure of the tree is determined by Hpval, which is a
-  disjunction, so let's do a case-split and handle both possibilities (since
-  that's what the code will do, too) *)
-  iDestruct "Hpval" as "[-> | Hsubtrees]".
-  - wp_pures.
-    (* in the case where the tree is None we just free the root pointer *)
+  (* We destruct the tree predicate into the two branches of the [∨], and carry
+  out the proof separately in each case. *)
+  iDestruct (tree_unfold with "Ht") as "[Ht|Ht]".
+  - (* The first case corresponds to an empty tree, where t ↦ None. In that case
+    the code reduces down to just executing a Free on the root pointer. *)
+    wp_rec.
+    wp_load; wp_pures.
     wp_free.
-    iApply "HΦ"; done.
-  - (* in the other case we need to further destruct [tree] to get out the left
+    iApply "HΦ"; auto.
+  - (* In the other case we need to further destruct [tree] to get out the left
     and right subtrees (both their root pointers and the corresponding [tree]
     predicates) *)
-    iDestruct "Hsubtrees" as (l r) "(-> & Hl & Hr)".
-    wp_pures.
+    iDestruct "Ht" as (l r) "(Ht & Hl & Hr)".
+    wp_rec.
+    wp_load; wp_pures.
     wp_apply ("IH" with "Hl"); iIntros "_"; wp_pures.
     wp_apply ("IH" with "Hr"); iIntros "_"; wp_pures.
     wp_free.
-    iApply "HΦ"; done.
+    iApply "HΦ"; auto.
 Qed.
 
 End proof.
