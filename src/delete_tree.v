@@ -88,6 +88,9 @@ Proof.
     iDestruct "Ht" as (l r) "(Ht & Hl & Hr)".
     wp_rec.
     wp_load; wp_pures.
+    (* The recursive calls make use of the inductive hypothesis "IH", which says
+    any recursive calls to delete_tree can be assumed to satisfy this
+    specification. *)
     wp_apply ("IH" with "Hl"); iIntros "_"; wp_pures.
     wp_apply ("IH" with "Hr"); iIntros "_"; wp_pures.
     wp_free.
