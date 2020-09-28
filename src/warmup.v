@@ -1,7 +1,4 @@
-From iris.heap_lang Require Export proofmode notation.
-
-Export Set Default Goal Selector "!".
-Export Set Default Proof Using "Type".
+From DeleteTree Require Import simplified_iris.
 
 Section proof.
 Context `{!heapG Σ}.
@@ -10,12 +7,15 @@ Theorem ex01 (x y: loc) :
   x ↦ #0 ∗ y ↦ #0 ⊢ WP #x <- #y;; #y <- #x {{ λ _, x ↦ #y ∗ y ↦ #x }}.
 Proof.
   iIntros "[Hx Hy]".
-  wp_apply (wp_store with "Hx").
-  iIntros "Hx"; wp_pures.
-
-  (* we're always going to want to give it the same name, so Iris has a tactic
-  for that: *)
-  wp_store.
+  wp_bind (Store _ _).
+  iApply wp_frame.
+  iSplitL "Hx".
+  { iApply (wp_store_axiom with "Hx"). }
+  simpl. iIntros (?) "Hx"; wp_pures.
+  iApply wp_frame.
+  iSplitL "Hy".
+  { iApply (wp_store_axiom with "Hy"). }
+  simpl. iIntros (?) "Hy"; wp_pures.
   iFrame.
 Qed.
 

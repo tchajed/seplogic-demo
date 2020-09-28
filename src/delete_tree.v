@@ -1,7 +1,4 @@
-From iris.heap_lang Require Export proofmode notation.
-
-Export Set Default Goal Selector "!".
-Export Set Default Proof Using "Type".
+From DeleteTree Require Import simplified_iris.
 
 (** * deletetree from the Separation Logic CACM paper by O'Hearn *)
 
@@ -58,10 +55,11 @@ Theorem tree_unfold t :
 Proof. apply (fixpoint_unfold tree_pre). Qed.
 
 Theorem wp_delete_tree t :
-  {{{ tree t }}}
-    delete_tree #t
-  {{{ RET #(); emp }}}.
+  tree t -∗
+  WP delete_tree #t
+  {{ λ _, emp }}.
 Proof.
+  iIntros "Ht".
 
   (* First we should understand how Hoare logic proofs are encoded in Iris. In
   the course infrastructure the goal is always a triple (a proc_spec goal). In
@@ -73,7 +71,6 @@ Proof.
 
   (* this is how we start a recursive proof: *)
   iLöb as "IH" forall (t).
-  iIntros (Φ) "Ht HΦ".
   (* What we get from iLöb is an assumption that delete_tree follows the
   specification. How is that possible? Couldn't we just use it right away and
   not have to any work? Indeed! That's why this assumption has the ▷ (pronounced
@@ -88,22 +85,41 @@ Proof.
   - (* The first case corresponds to an empty tree, where t ↦ None. In that case
     the code reduces down to just executing a Free on the root pointer. *)
     wp_rec.
+    (* I won't go through the motions of using the frame rule and
+    load/store/free axioms; there's a tactic for that *)
     wp_load; wp_pures.
     wp_free.
-    iApply "HΦ"; auto.
+    auto.
   - (* In the other case we need to further destruct [tree] to get out the left
     and right subtrees (both their root pointers and the corresponding [tree]
     predicates) *)
     iDestruct "Ht" as (l r) "(Ht & Hl & Hr)".
     wp_rec.
     wp_load; wp_pures.
+
+    (* wp_bind is a tactic to apply the sequencing rule (it takes an argument to
+    pick what should be sequenced, for example in e1;; e2;; e3 you can isolate
+    (e1;;e2) if you want) *)
+    wp_bind (delete_tree _).
+
     (* The recursive calls make use of the inductive hypothesis "IH", which says
     any recursive calls to delete_tree can be assumed to satisfy this
     specification. *)
-    wp_apply ("IH" with "Hl"); iIntros "_"; wp_pures.
-    wp_apply ("IH" with "Hr"); iIntros "_"; wp_pures.
+    iApply wp_frame.
+    iSplitL "Hl".
+    { iApply ("IH" with "Hl"). }
+    (* I'm naming the postcondition from the deletetree specification "Hl" just
+    to emphasize what happened (it's an emp and thus unimportant, the equivalent
+    of having a hypothesis "True") *)
+    simpl; iIntros (?) "Hl"; wp_pures.
+
+    wp_bind (delete_tree _).
+    iApply wp_frame.
+    iSplitL "Hr".
+    { iApply ("IH" with "Hr"). }
+    simpl; iIntros (?) "Hr"; wp_pures.
     wp_free.
-    iApply "HΦ"; auto.
+    auto.
 Qed.
 
 End proof.
