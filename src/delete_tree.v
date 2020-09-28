@@ -12,7 +12,7 @@ Definition delete_tree: val :=
   rec: "delete_tree" "x" :=
     (* !"x" deferences the variable x (variables need to be quoted) *)
     match: !"x" with
-      InjR "tree" =>
+      SOME "tree" =>
       (* if this tree has children, delete them first. Recall the tree is just a
       tuple of the left and right child tree pointers. *)
       (let: "left" := Fst "tree" in
@@ -21,7 +21,7 @@ Definition delete_tree: val :=
        "delete_tree" "right";;
       (* then free the root pointer *)
       Free "x")
-    | InjL <> =>
+    | NONE =>
       (* the way we've represented trees, even an empty tree is a pointer to a
       None, so free that, too *)
       Free "x"
@@ -35,7 +35,7 @@ Implicit Types (t l r:loc).
 (* You can ignore some magic that creates the recursive tree predicate... *)
 
 Definition tree_pre (tree: loc -d> iPropO Σ): loc -d> iPropO Σ :=
-  (λ t, t ↦ InjLV #() ∨ (∃ l r, t ↦ InjRV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r))%I.
+  (λ t, t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r))%I.
 
 Local Instance tree_pre_contractive : Contractive tree_pre.
 Proof.
@@ -51,7 +51,7 @@ is the same as P; it's a technically related to writing recursive predicates in
 Iris. *)
 Theorem tree_unfold t :
   tree t ⊣⊢
-  t ↦ InjLV #() ∨ (∃ l r, t ↦ InjRV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r).
+  t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r).
 Proof. apply (fixpoint_unfold tree_pre). Qed.
 
 Theorem wp_delete_tree t :

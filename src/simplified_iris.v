@@ -1,5 +1,11 @@
 From iris.heap_lang Require Export proofmode notation.
 
+(* make these print *)
+Notation NONE := (InjL (LitV LitUnit)).
+Notation NONEV := (InjLV (LitV LitUnit)).
+Notation SOME x := (InjR x).
+Notation SOMEV x := (InjRV x).
+
 Export Set Default Goal Selector "!".
 Export Set Default Proof Using "Type".
 
@@ -28,6 +34,5 @@ Proof. iIntros "Hl". wp_load. auto. Qed.
 Lemma wp_free_axiom (l: loc) (v: val) :
   l ↦ v ⊢ WP Free #l {{ λ _, emp }}.
 Proof. iIntros "Hl". wp_free. auto. Qed.
-
 
 End proof.
