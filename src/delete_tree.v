@@ -1,4 +1,4 @@
-From DeleteTree Require Import simplified_iris.
+From demo Require Import simplified_iris.
 
 (** * deletetree from the Separation Logic CACM paper by O'Hearn *)
 

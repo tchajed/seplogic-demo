@@ -1,4 +1,4 @@
-From DeleteTree Require Import simplified_iris.
+From demo Require Import simplified_iris.
 
 Section proof.
 Context `{!heapG Σ}.

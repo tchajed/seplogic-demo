@@ -1,4 +1,4 @@
-From DeleteTree Require Import simplified_iris delete_tree.
+From demo Require Import simplified_iris delete_tree.
 From iris.heap_lang Require Import lib.par.
 
 Definition delete_tree_par: val :=
