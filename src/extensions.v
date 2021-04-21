@@ -100,9 +100,9 @@ Proof using All.
   - iDestruct "Ht" as (l r) "(Ht & Hl & Hr)".
     wp_load; wp_pures.
     wp_apply (wp_par (λ _, emp)%I (λ _, emp)%I with "[Hl] [Hr]").
-    + wp_apply ("IH" with "Hl"); iIntros "_"; wp_pures.
+    + wp_apply ("IH" with "Hl"); iIntros "_".
       done.
-    + wp_apply ("IH" with "Hr"); iIntros "_"; wp_pures.
+    + wp_apply ("IH" with "Hr"); iIntros "_".
       done.
     + iIntros (??) "_ !>".
       wp_pures.

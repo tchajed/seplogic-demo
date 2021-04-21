@@ -87,6 +87,7 @@ Proof.
     wp_alloc l.
     wp_store.
     iApply "HΦ".
+    iModIntro.
     iApply tree_unfold.
     iRight.
     iExists ∅, ∅, _, _, _.
@@ -100,8 +101,8 @@ Proof.
     wp_load; wp_pures.
     rewrite bool_decide_decide.
     destruct (decide (#x = #key)) as [Heqb|Heqb]; wp_pures.
-    + inversion Heqb; subst.
-      wp_pures.
+    + iModIntro.
+      inversion Heqb; subst.
       iApply "HΦ".
       rewrite !assoc_L.
       replace {[key; key]} with ({[key]}: gset Z) by set_solver.

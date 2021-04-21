@@ -42,7 +42,7 @@ Proof.
   iApply wp_frame.
   iSplitL "Hy".
   { iApply (wp_store_axiom with "Hy"). }
-  simpl. iIntros (?) "Hy"; wp_pures.
+  simpl. iIntros (?) "Hy".
   iFrame.
 Qed.
 
