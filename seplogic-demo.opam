@@ -1,0 +1,27 @@
+opam-version: "2.0"
+name: "seplogic-demo"
+maintainer: "Tej Chajed <tchajed@mit.edu>"
+authors: "Tej Chajed <tchajed@mit.edu>"
+license: "MIT"
+homepage: "https://github.com/tchajed/seplogic-demo"
+bug-reports: "https://github.com/tchajed/seplogic-demo/issues"
+dev-repo: "git+https://github.com/tchajed/seplogic-demo.git"
+
+synopsis: "Separation logic demo using Iris"
+description: """
+Proofs of examples from the CACM Separation Logic paper by Peter O'Hearn
+"""
+
+depends: [
+  "coq" {>= "8.12"}
+  "coq-iris-heap-lang" {>= "dev.2021-11-26.0.255341dd" | = "dev"}
+]
+
+build: [make "-j%{jobs}%"]
+install: [make "install"]
+
+tags: [
+  "category:Miscellaneous"
+  "keyword:iris"
+  "logpath:demo"
+]
