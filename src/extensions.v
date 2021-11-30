@@ -36,7 +36,7 @@ Definition expand_right: val :=
 
 Section proof.
 
-Context `{!heapG Σ} `{!spawnG Σ}.
+Context `{!heapGS Σ} `{!spawnG Σ}.
 Implicit Types (t l r:loc).
 
 Theorem wp_mk_empty_tree :

@@ -1,7 +1,7 @@
 From demo Require Import simplified_iris.
 
 Section proof.
-Context `{!heapG Σ}.
+Context `{!heapGS Σ}.
 
 Theorem coq_swap (P Q: Prop):
   P ∧ Q → Q ∧ P.

@@ -34,7 +34,7 @@ Definition search: val :=
     end.
 
 Section proof.
-Context `{!heapG Σ}.
+Context `{!heapGS Σ}.
 Implicit Types (t l r:loc).
 
 Definition tree_pre (tree: loc -d> gset Z -d> iPropO Σ): loc -d> gset Z -d> iPropO Σ :=

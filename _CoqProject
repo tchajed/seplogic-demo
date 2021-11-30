@@ -1,5 +1,6 @@
 -Q src demo
--arg -w -arg -convert_concl_no_check
+# Iris-disabled warnings
+-arg -w -arg -notation-overridden,-redundant-canonical-projection,-convert_concl_no_check,-undeclared-scope
 
 src/simplified_iris.v
 src/warmup.v

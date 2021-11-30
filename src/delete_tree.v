@@ -29,7 +29,7 @@ Definition delete_tree: val :=
 
 Section proof.
 
-Context `{!heapG Σ}.
+Context `{!heapGS Σ}.
 Implicit Types (t l r:loc).
 
 (* You can ignore some magic that creates the recursive tree predicate... *)

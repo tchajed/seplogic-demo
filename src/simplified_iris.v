@@ -10,7 +10,7 @@ Export Set Default Goal Selector "!".
 Export Set Default Proof Using "Type".
 
 Section proof.
-Context `{!heapG Σ}.
+Context `{!heapGS Σ}.
 
 Lemma wp_frame (e: expr) (Φ Φ': val → iProp Σ) :
   WP e {{Φ}} ∗ (∀ r, Φ r -∗ Φ' r) ⊢ WP e {{Φ'}}.
