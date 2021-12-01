@@ -47,10 +47,7 @@ Definition tree_pre (tree: loc -d> gset Z -d> iPropO Σ): loc -d> gset Z -d> iPr
         ▷ tree l left_els ∗ ▷ tree r right_els))%I.
 
 Local Instance tree_pre_contractive : Contractive tree_pre.
-Proof.
-  rewrite /tree_pre=> n tree tree' Htree t els.
-  repeat (f_contractive || f_equiv); apply Htree.
-Qed.
+Proof. solve_contractive. Qed.
 
 Definition tree : loc → gset Z → iProp Σ := fixpoint tree_pre.
 
@@ -82,19 +79,22 @@ Proof.
   wp_rec; wp_pures.
   iDestruct (tree_unfold with "Ht") as "[Ht|Ht]".
   - iDestruct "Ht" as (->) "Ht".
+    (* this is just "symbolic execution", directed by the program syntax *)
     wp_load; wp_pures.
     wp_alloc r.
     wp_alloc l.
     wp_store.
     iApply "HΦ".
     iModIntro.
+
+    (* here we build a singleton [tree] predicate out of points-to facts *)
     iApply tree_unfold.
     iRight.
     iExists ∅, ∅, _, _, _.
     iFrame.
-    iSplit; first by iPureIntro; set_solver.
-    iSplit; first by iPureIntro; set_solver.
-    iSplit; first by iPureIntro; set_solver.
+    iSplit; first by (iPureIntro; set_solver).
+    iSplit; first by (iPureIntro; set_solver).
+    iSplit; first by (iPureIntro; set_solver).
     rewrite -!tree_empty.
     iFrame.
   - iDestruct "Ht" as (????? -> Hleft Hright) "(Ht&Hl&Hr)".
@@ -104,6 +104,8 @@ Proof.
     + iModIntro.
       inversion Heqb; subst.
       iApply "HΦ".
+
+      (* another [tree] separation logic theorem (no code involved) *)
       rewrite !assoc_L.
       replace {[key; key]} with ({[key]}: gset Z) by set_solver.
       iApply tree_unfold; iRight.
@@ -116,17 +118,21 @@ Proof.
       * iApply ("IH" with "Hl").
         iIntros "!> Hl".
         iApply "HΦ".
+
         iApply tree_unfold; iRight.
         iExists ({[x]} ∪ left_els), right_els, _, _, _; iFrame.
         iPureIntro.
+        (* [set_solver] does a lot of work here for us *)
         set_solver.
       * iApply ("IH" with "Hr").
         iIntros "!> Hr".
         iApply "HΦ".
+
         iApply tree_unfold; iRight.
         iExists left_els, ({[x]} ∪ right_els), _, _, _; iFrame.
         iPureIntro.
         assert (key < x) by lia.
+        (* [set_solver] does a lot of work here for us *)
         set_solver.
 Qed.
 

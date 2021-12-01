@@ -38,17 +38,13 @@ Definition tree_pre (tree: loc -d> iPropO Σ): loc -d> iPropO Σ :=
   (λ t, t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r))%I.
 
 Local Instance tree_pre_contractive : Contractive tree_pre.
-Proof.
-  rewrite /tree_pre=> n tree tree' Htree t.
-  repeat (f_contractive || f_equiv); apply Htree.
-Qed.
+Proof. solve_contractive. Qed.
 
 Definition tree : loc → iProp Σ := fixpoint tree_pre.
 
-(** Following the fixpoint magic above, the definition [tree] ends up being the
-recursive definition we expect (the ⊣⊢ means "equivalent"). You can pretend ▷P
-is the same as P; it's a technically related to writing recursive predicates in
-Iris. *)
+(** You can take the following as a definition for [tree], in terms of a recursive
+equation - the ⊣⊢ symbol means "equivalent". You can pretend ▷P is the same as P;
+this is a technicality required to write recursive definitions. *)
 Theorem tree_unfold t :
   tree t ⊣⊢
   t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r).
@@ -62,7 +58,6 @@ Proof.
   iIntros "Ht".
 
   (* First we should understand how Hoare logic proofs are encoded in Iris. In
-  the course infrastructure the goal is always a triple (a proc_spec goal). In
   Iris the goal is going to be [WP e {{ Q }}], which is a separation logic
   predicate, not a Coq assertion. For intuition, keep in mind that {{P}} e {{Q}}
   is the same thing as P ⊢ WP e {{ Q }}. Then, you can think of the spec being
@@ -108,9 +103,9 @@ Proof.
     iApply wp_frame.
     iSplitL "Hl".
     { iApply ("IH" with "Hl"). }
-    (* I'm naming the postcondition from the deletetree specification "Hl" just
-    to emphasize what happened (it's an emp and thus unimportant, the equivalent
-    of having a hypothesis "True") *)
+    (* I'm naming the postcondition from the [delete_tree] specification "Hl" just
+    to emphasize what happened (it's an [emp] and thus unimportant, the equivalent
+    of having a hypothesis [True]) *)
     simpl; iIntros (?) "Hl"; wp_pures.
 
     wp_bind (delete_tree _).

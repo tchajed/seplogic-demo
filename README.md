@@ -13,3 +13,8 @@ The two main examples are:
   recursively is safe, and
 - [binary_search.v](src/binary_search.v), which proves functional correctness of
   the insert and search procedures for a binary search tree.
+
+[extensions.v](src/extensions.v) might also be interesting: it makes these
+examples a bit more complete by implementing more functions to construct trees,
+and implements a parallel version of `delete_tree` whose proof is more or less
+the same as the sequential version due to the magic of concurrent separation logic.
