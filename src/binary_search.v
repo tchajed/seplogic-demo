@@ -99,8 +99,7 @@ Proof.
     iFrame.
   - iDestruct "Ht" as (????? -> Hleft Hright) "(Ht&Hl&Hr)".
     wp_load; wp_pures.
-    rewrite bool_decide_decide.
-    destruct (decide (#x = #key)) as [Heqb|Heqb]; wp_pures.
+    case_bool_decide as Heqb; wp_pures.
     + iModIntro.
       inversion Heqb; subst.
       iApply "HΦ".
@@ -113,8 +112,7 @@ Proof.
       iPureIntro.
       split_and!; set_solver.
     + assert (x ≠ key) by (intros ->; auto).
-      rewrite bool_decide_decide.
-      destruct (decide (x < key)%Z) as [Heqb2|Heqb2]; wp_pures.
+      case_bool_decide as Heqb2; wp_pures.
       * iApply ("IH" with "Hl").
         iIntros "!> Hl".
         iApply "HΦ".
@@ -152,8 +150,7 @@ Proof.
     by iApply tree_empty.
   - iDestruct "Ht" as (????? -> Hleft Hright) "(Ht&Hl&Hr)".
     wp_load; wp_pures.
-    rewrite bool_decide_decide.
-    destruct (decide (#x = #key)) as [Heqb|Heqb]; wp_pures.
+    case_bool_decide as Heqb; wp_pures.
     + inversion Heqb; subst.
       replace x_in_els with true.
       { iApply "HΦ".
@@ -163,15 +160,14 @@ Proof.
       apply symmetry, bool_decide_eq_true.
       set_solver.
     + assert (x ≠ key) by (intros ->; auto).
-      rewrite bool_decide_decide.
-      destruct (decide (x < key)%Z) as [Heqb2|Heqb2]; wp_pures.
+      case_bool_decide as Heqb2; wp_pures.
       * iApply ("IH" with "Hl").
         iIntros "!> Hl".
         replace (bool_decide (x ∈ left_els)) with x_in_els.
         { iApply "HΦ".
           iApply tree_unfold; iRight.
           eauto 10 with iFrame. }
-        apply bool_decide_iff.
+        apply bool_decide_ext.
         assert (~(key < x)) by lia.
         set_solver.
       * iApply ("IH" with "Hr").
@@ -180,7 +176,7 @@ Proof.
         { iApply "HΦ".
           iApply tree_unfold; iRight.
           eauto 10 with iFrame. }
-        apply bool_decide_iff.
+        apply bool_decide_ext.
         assert (key < x) by lia.
         set_solver.
 Qed.

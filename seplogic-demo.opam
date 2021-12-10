@@ -14,7 +14,7 @@ Proofs of examples from the CACM Separation Logic paper by Peter O'Hearn
 
 depends: [
   "coq" {>= "8.12"}
-  "coq-iris-heap-lang" {>= "dev.2021-11-26.0.255341dd" | = "dev"}
+  "coq-iris-heap-lang" {>= "dev.2021-12-09.1.f52f9f6a" | = "dev"}
 ]
 
 build: [make "-j%{jobs}%"]
