@@ -15,9 +15,10 @@ jobs:
     strategy:
       matrix:
         coq_version:
-          - "8.13"
+          - "8.14"
+          - "8.15"
           - dev
-        ocaml_version: ["4.11-flambda"]
+        ocaml_version: ["4.13-flambda"]
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
