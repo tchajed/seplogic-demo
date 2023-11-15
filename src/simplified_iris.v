@@ -1,5 +1,8 @@
 From iris.heap_lang Require Export proofmode notation.
 
+(** This file isn't shown in the demo, it just supplies a few tools to make the
+demo easier to follow. *)
+
 (* make these print *)
 Notation NONE := (InjL (LitV LitUnit)).
 Notation NONEV := (InjLV (LitV LitUnit)).
@@ -20,19 +23,19 @@ these axioms plus explicit calls to [wp_frame].
 *)
 
 Lemma wp_store_axiom (l: loc) (v0 v: val) :
-  l ↦ v0 ⊢ WP (#l <- v) {{ λ _, l ↦ v }}.
+  l ↦ v0 ⊢ WP (#l <- v) {{ λ (_: val), l ↦ v }}.
 Proof. iIntros "Hl". wp_store. auto. Qed.
 
 Lemma wp_load_axiom (l: loc) (v: val) :
-  l ↦ v ⊢ WP ! #l {{ λ r, ⌜r = v⌝ ∗ l ↦ v }}.
+  l ↦ v ⊢ WP ! #l {{ λ (r: val), ⌜r = v⌝ ∗ l ↦ v }}.
 Proof. iIntros "Hl". wp_load. auto. Qed.
 
 Lemma wp_free_axiom (l: loc) (v: val) :
-  l ↦ v ⊢ WP Free #l {{ λ _, emp }}.
+  l ↦ v ⊢ WP Free #l {{ λ (_: val), emp }}.
 Proof. iIntros "Hl". wp_free. auto. Qed.
 
 Lemma wp_frame (e: expr) (Φ Φ': val → iProp Σ) :
-  WP e {{Φ}} ∗ (∀ r, Φ r -∗ Φ' r) ⊢ WP e {{Φ'}}.
+  WP e {{Φ}} ∗ (∀ (r: val), Φ r -∗ Φ' r) ⊢ WP e {{Φ'}}.
 Proof.
   iIntros "[Hwp Himpl]".
   iApply (wp_strong_mono with "Hwp [Himpl]").

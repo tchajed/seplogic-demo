@@ -1,5 +1,12 @@
 From demo Require Import simplified_iris.
 
+(** Warmup: getting used to reading Coq and Iris Proof Mode (IPM) goals.
+
+Coq is fundamentally an interactive tool, which means you have to "step through"
+the code and look at the proof state at each step. Without this, it's unusable -
+nobody magically writes this code and simulates its effects mentally.
+ *)
+
 Section proof.
 Context `{!heapGS Σ}.
 
@@ -30,20 +37,42 @@ Proof.
   iFrame.
 Qed.
 
+(** This lemma is equivalent to the Hoare triple
+
+{{ x ↦ #0 ∗ y ↦ #0 }}
+  #x <- #y;; #y <- #x
+{{ λ _, x ↦ #y ∗ y ↦ #x }}
+
+but expressed using WP, a "weakest precondition".
+
+ *)
+
 Theorem ex01 (x y: loc) :
   x ↦ #0 ∗ y ↦ #0 ⊢
   WP #x <- #y;; #y <- #x {{ λ _, x ↦ #y ∗ y ↦ #x }}.
 Proof.
   iIntros "[Hx Hy]".
-  wp_bind (Store _ _).
+
+  (* How do we break down this proof? We'll want to first reason about the load,
+  then the rest of the program. *)
+
+  wp_bind (_ <- _)%E.
   iApply wp_frame.
+  (* The combination of [wp_bind] and [wp_frame] leaves us with two obligations
+  to prove _separately_: we pick some ?Goal which is the postcondition for #x <-
+  #y, and then get that postcondition as an assumption to prove a WP for the
+   rest of the original code. *)
+
+  (* In separation logic, to prove [P ∗ Q] we have to decide how to split our
+  resources. We choose to use "Hx" on the left and the rest on the right. *)
+
   iSplitL "Hx".
   { iApply (wp_store_axiom with "Hx"). }
-  simpl. iIntros (?) "Hx"; wp_pures.
+  iIntros (?) "Hx"; wp_pures.
   iApply wp_frame.
   iSplitL "Hy".
   { iApply (wp_store_axiom with "Hy"). }
-  simpl. iIntros (?) "Hy".
+  iIntros (?) "Hy".
   iFrame.
 Qed.
 
