@@ -79,6 +79,59 @@ Proof.
   iApply tree_unfold; iLeft; auto.
 Qed.
 
+Lemma singleton_tree_from_empty (x : Z) t r l :
+  t ↦ SOMEV (#x, (#l, #r)) ∗
+    l ↦ NONEV ∗
+    r ↦ NONEV ⊢
+  tree t ({[x]} ∪ ∅).
+Proof.
+  iIntros "(Ht & Hl & Hr)".
+  rewrite tree_unfold.
+  iRight.
+  iExists ∅, ∅, _, _, _.
+  iFrame.
+  iSplit; first by (iPureIntro; set_solver).
+  iSplit; first by (iPureIntro; set_solver).
+  iSplit; first by (iPureIntro; set_solver).
+  rewrite -!tree_empty.
+  iFrame.
+Qed.
+
+Lemma tree_insert_left (x : Z) t (left_els right_els : gset Z) (key : Z) l r :
+  (∀ e : Z, e ∈ left_els → e < key)
+  → (∀ e : Z, e ∈ right_els → key < e)
+  → x < key
+  → t ↦ SOMEV (#key, (#l, #r)) ∗
+      tree l ({[x]} ∪ left_els) ∗
+      tree r right_els ⊢
+  tree t ({[x]} ∪ ({[key]} ∪ left_els ∪ right_els)).
+Proof.
+  intros Hleft Hright Heqb2.
+  iIntros "(Ht & Hl & Hr)".
+  iApply tree_unfold; iRight.
+  iExists ({[x]} ∪ left_els), right_els, _, _, _; iFrame.
+  iPureIntro.
+  (* [set_solver] does a lot of work here for us *)
+  set_solver.
+Qed.
+
+Lemma tree_insert_right (x : Z) t (left_els right_els : gset Z) (key : Z) l r :
+  (∀ e : Z, e ∈ left_els → e < key)
+  → (∀ e : Z, e ∈ right_els → key < e)
+  → key < x
+  → t ↦ SOMEV (#key, (#l, #r)) ∗
+      tree l left_els ∗
+      tree r ({[x]} ∪ right_els) ⊢
+  tree t ({[x]} ∪ ({[key]} ∪ left_els ∪ right_els)).
+Proof.
+  intros Hleft Hright Heqb2.
+  iIntros "(Ht & Hl & Hr)".
+  iApply tree_unfold; iRight.
+  iExists left_els, ({[x]} ∪ right_els), _, _, _; iFrame.
+  iPureIntro.
+  set_solver.
+Qed.
+
 Theorem wp_tree_insert t (x:Z) els :
   {{{ tree t els }}}
     insert #t #x
@@ -98,15 +151,7 @@ Proof.
     iModIntro.
 
     (* here we build a singleton [tree] predicate out of points-to facts *)
-    iApply tree_unfold.
-    iRight.
-    iExists ∅, ∅, _, _, _.
-    iFrame.
-    iSplit; first by (iPureIntro; set_solver).
-    iSplit; first by (iPureIntro; set_solver).
-    iSplit; first by (iPureIntro; set_solver).
-    rewrite -!tree_empty.
-    iFrame.
+    iApply (singleton_tree_from_empty with "[$]").
   - iDestruct "Ht" as (????? -> Hleft Hright) "(Ht&Hl&Hr)".
     wp_load; wp_pures.
     case_bool_decide as Heqb; wp_pures.
@@ -127,21 +172,13 @@ Proof.
         iIntros "!> Hl".
         iApply "HΦ".
 
-        iApply tree_unfold; iRight.
-        iExists ({[x]} ∪ left_els), right_els, _, _, _; iFrame.
-        iPureIntro.
-        (* [set_solver] does a lot of work here for us *)
-        set_solver.
+        iApply (tree_insert_left with "[$Ht $Hl $Hr]"); auto.
       * iApply ("IH" with "Hr").
         iIntros "!> Hr".
         iApply "HΦ".
 
-        iApply tree_unfold; iRight.
-        iExists left_els, ({[x]} ∪ right_els), _, _, _; iFrame.
-        iPureIntro.
         assert (key < x) by lia.
-        (* [set_solver] does a lot of work here for us *)
-        set_solver.
+        iApply (tree_insert_right with "[$Ht $Hl $Hr]"); auto.
 Qed.
 
 Theorem wp_tree_search t (x:Z) els :
@@ -164,6 +201,8 @@ Proof.
     + inversion Heqb; subst.
       replace x_in_els with true.
       { iApply "HΦ".
+        (* this is a little silly: we haven't modified anything but we have to
+        reconstruct the [tree] predicate *)
         iApply tree_unfold; iRight.
         eauto 10 with iFrame. }
       rewrite /x_in_els.
