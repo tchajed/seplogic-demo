@@ -32,7 +32,7 @@ Section proof.
 Context `{!heapGS Σ}.
 Implicit Types (t l r:loc).
 
-(* You can ignore some magic that creates the recursive tree predicate... *)
+(* You can ignore some magic that creates the recursive tree predicate. *)
 
 Definition tree_pre (tree: loc -d> iPropO Σ): loc -d> iPropO Σ :=
   (λ t, t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r))%I.

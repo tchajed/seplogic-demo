@@ -31,7 +31,8 @@ Proof.
 Qed.
 
 Theorem ex01 (x y: loc) :
-  x ↦ #0 ∗ y ↦ #0 ⊢ WP #x <- #y;; #y <- #x {{ λ _, x ↦ #y ∗ y ↦ #x }}.
+  x ↦ #0 ∗ y ↦ #0 ⊢
+  WP #x <- #y;; #y <- #x {{ λ _, x ↦ #y ∗ y ↦ #x }}.
 Proof.
   iIntros "[Hx Hy]".
   wp_bind (Store _ _).

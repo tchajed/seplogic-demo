@@ -1,6 +1,11 @@
 From demo Require Import simplified_iris.
 From stdpp Require Import list.
 
+(** Extension of the deletetree demo from the paper where we prove functional
+correctness of some binary search tree operations. The definition of a [tree]
+will now take an additional parameter giving its abstract value: in this case,
+that is a set of integers logically stored in the tree. *)
+
 Open Scope Z_scope.
 
 Definition insert: val :=
@@ -51,12 +56,17 @@ Proof. solve_contractive. Qed.
 
 Definition tree : loc → gset Z → iProp Σ := fixpoint tree_pre.
 
+(** More complicated than the equivalent in delete_tree.v, but only because we
+need to capture the memory layout, how the abstract state is encoded, and also
+the binary search invariant. *)
 Theorem tree_unfold t els :
   tree t els ⊣⊢
   (⌜els = ∅⌝ ∧ t ↦ NONEV) ∨
     (∃ left_els right_els (key: Z) l r,
         ⌜els = {[key]} ∪ left_els ∪ right_els⌝ ∗
+                 (* "left_els < key" *)
         ⌜∀ e, e ∈ left_els → e < key⌝ ∗
+                 (* "key < right_els" *)
         ⌜∀ e, e ∈ right_els → key < e⌝ ∗
         t ↦ SOMEV (#key, (#l, #r)) ∗
         ▷ tree l left_els ∗ ▷ tree r right_els).
