@@ -63,7 +63,7 @@ Theorem tree_unfold t els :
 Proof. apply (fixpoint_unfold tree_pre). Qed.
 
 Lemma tree_empty t :
-  t ↦ NONEV -∗ tree t ∅.
+  t ↦ NONEV ⊢ tree t ∅.
 Proof.
   iIntros "Ht".
   iApply tree_unfold; iLeft; auto.

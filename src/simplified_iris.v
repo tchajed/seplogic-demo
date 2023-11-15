@@ -6,8 +6,8 @@ Notation NONEV := (InjLV (LitV LitUnit)).
 Notation SOME x := (InjR x).
 Notation SOMEV x := (InjRV x).
 
-Export Set Default Goal Selector "!".
-Export Set Default Proof Using "Type".
+#[export] Set Default Goal Selector "!".
+#[export] Set Default Proof Using "Type".
 
 Section proof.
 Context `{!heapGS Σ}.
