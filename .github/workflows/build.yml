@@ -60,8 +60,8 @@ jobs:
             startGroup Alectryon docs
               make -k doc
             endGroup
-        # skip uninstall since we need docs/ for upload
-        uninstall: ""
+          # skip uninstall since we need docs/ for upload
+          uninstall: ""
       - name: Revert permissions
         # to avoid a warning at cleanup time
         if: ${{ always() }}
