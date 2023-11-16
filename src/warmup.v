@@ -39,17 +39,18 @@ Qed.
 
 (** This lemma is equivalent to the Hoare triple
 
-{{ x ↦ #0 ∗ y ↦ #0 }}
+{{{ x ↦ #0 ∗ y ↦ #0 }}}
   #x <- #y;; #y <- #x
-{{ λ _, x ↦ #y ∗ y ↦ #x }}
+{{{ RET _; x ↦ #y ∗ y ↦ #x }}}
 
 but expressed using WP, a "weakest precondition".
 
  *)
 
-Theorem ex01 (x y: loc) :
+Lemma ex01 (x y: loc) :
   x ↦ #0 ∗ y ↦ #0 ⊢
-  WP #x <- #y;; #y <- #x {{ λ _, x ↦ #y ∗ y ↦ #x }}.
+  WP #x <- #y;; #y <- #x
+  {{ λ _, x ↦ #y ∗ y ↦ #x }}.
 Proof.
   iIntros "[Hx Hy]".
 
@@ -74,6 +75,21 @@ Proof.
   { iApply (wp_store_axiom with "Hy"). }
   iIntros (?) "Hy".
   iFrame.
+Qed.
+
+(** This is a more typical proof, using the Hoare triple notation and more
+automation. It is also stronger than [ex01] in that it promises the return value
+is #(). *)
+Lemma ex01_triple (x y: loc) :
+  {{{ x ↦ #0 ∗ y ↦ #0 }}}
+  #x <- #y;;
+  #y <- #x
+  {{{ RET #(); x ↦ #y ∗ y ↦ #x }}}.
+Proof.
+  iIntros (Φ) "[Hx Hy] HΦ".
+  wp_store.
+  wp_store.
+  iApply ("HΦ" with "[$]").
 Qed.
 
 End proof.

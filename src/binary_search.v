@@ -115,7 +115,8 @@ Proof.
   set_solver.
 Qed.
 
-Lemma tree_insert_right (x : Z) t (left_els right_els : gset Z) (key : Z) l r :
+Lemma tree_insert_right t (left_els right_els : gset Z)
+  (x key : Z) l r :
   (∀ e : Z, e ∈ left_els → e < key)
   → (∀ e : Z, e ∈ right_els → key < e)
   → key < x
