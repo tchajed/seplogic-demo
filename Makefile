@@ -1,3 +1,12 @@
+COQPROJECT_ARGS := $(shell sed -E -e '/^\#/d' -e 's/-arg ([^ ]*)/\1/g' _CoqProject)
+COQPROJECT_Q_ARGS := $(shell grep '^-Q' _CoqProject)
+ALECTRYON_CACHE := .alectryon.cache
+ALECTRYON_FLAGS := $(COQPROJECT_Q_ARGS) \
+	--long-line-threshold 80 \
+	--cache-directory $(ALECTRYON_CACHE) --cache-compression
+PROJ_VFILES := $(shell find 'src' -name "*.v")
+DOC_VFILES := $(PROJ_VFILES:src/%.v=docs/%.html)
+
 ## this Makefile, as well as the test setup in Makefile.coq.local, is copied
 ## from std++ (https://gitlab.mpi-sws.org/iris/stdpp)
 
@@ -39,6 +48,20 @@ build-dep: build-dep/opam phony
 Makefile: ;
 _CoqProject: ;
 opam: ;
+
+# alectryon targets
+doc: $(DOC_VFILES)
+
+.PHONY: doc
+
+docs:
+	@mkdir -p docs
+
+docs/%.html: src/%.v src/%.vo | docs
+	@echo "ALECTRYON $<"
+	@alectryon $(ALECTRYON_FLAGS) --frontend coq+rst --backend webpage $< -o $@
+
+
 
 # Phony wildcard targets
 phony: ;

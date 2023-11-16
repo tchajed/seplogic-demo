@@ -35,16 +35,18 @@ Implicit Types (t l r:loc).
 (* You can ignore some magic that creates the recursive tree predicate. *)
 
 Definition tree_pre (tree: loc -d> iPropO Σ): loc -d> iPropO Σ :=
-  (λ t, t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r))%I.
+  (λ t, t ↦ NONEV ∨
+        (∃ l r, t ↦ SOMEV (#l, #r) ∗
+                ▷ tree l ∗ ▷ tree r))%I.
 
 Local Instance tree_pre_contractive : Contractive tree_pre.
 Proof. solve_contractive. Qed.
 
 Definition tree : loc → iProp Σ := fixpoint tree_pre.
 
-(** You can take the following as a definition for [tree], in terms of a recursive
-equation - the ⊣⊢ symbol means "equivalent". You can pretend ▷P is the same as P;
-this is a technicality required to write recursive definitions. *)
+(** You can take the following as a definition for [tree], in terms of a
+recursive equation - the ⊣⊢ symbol means "equivalent". You can pretend ▷P is the
+same as P; this is a technicality required to write recursive definitions. *)
 Theorem tree_unfold t :
   tree t ⊣⊢
   t ↦ NONEV ∨ (∃ l r, t ↦ SOMEV (#l, #r) ∗ ▷ tree l ∗ ▷ tree r).
@@ -103,9 +105,9 @@ Proof.
     iApply wp_frame.
     iSplitL "Hl".
     { iApply ("IH" with "Hl"). }
-    (* I'm naming the postcondition from the [delete_tree] specification "Hl" just
-    to emphasize what happened (it's an [emp] and thus unimportant, the equivalent
-    of having a hypothesis [True]) *)
+    (* I'm naming the postcondition from the [delete_tree] specification "Hl"
+    just to emphasize where it came from (it's an [emp] and thus unimportant,
+    the separation logic equivalent of having a hypothesis [True]) *)
     simpl; iIntros (?) "Hl"; wp_pures.
 
     wp_bind (delete_tree _).
