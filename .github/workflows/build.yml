@@ -49,6 +49,9 @@ jobs:
               opam install -y -v -j 2 $PACKAGE
               opam list
             endGroup
+            startGroup Alectryon docs
+              make doc
+            endGroup
             startGroup Uninstallation test
               opam remove $PACKAGE
             endGroup
