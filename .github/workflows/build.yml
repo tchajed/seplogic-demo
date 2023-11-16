@@ -57,7 +57,7 @@ jobs:
             endGroup
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && ${{ matrix.coq_version }} == 'dev'
         with:
           path: ./docs
 
