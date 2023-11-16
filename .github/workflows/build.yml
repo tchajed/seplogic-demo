@@ -34,6 +34,7 @@ jobs:
           coq_version: ${{ matrix.coq_version }}
           ocaml_version: ${{ matrix.ocaml_version }}
           custom_script: |
+            sudo chown -R coq:coq . # workaround a permission issue
             startGroup Add Iris repo
               opam repo add iris-dev https://gitlab.mpi-sws.org/iris/opam.git
             endGroup
@@ -46,15 +47,15 @@ jobs:
               opam install -y -j 2 $PACKAGE --deps-only
             endGroup
             startGroup Build
-              opam install -y -v -j 2 $PACKAGE
-              opam list
+              make -k all
             endGroup
             startGroup Alectryon docs
-              make doc
+              make -k doc
             endGroup
-            startGroup Uninstallation test
-              opam remove $PACKAGE
-            endGroup
+      - name: Revert permissions
+        # to avoid a warning at cleanup time
+        if: ${{ always() }}
+        run: sudo chown -R 1001:116 .
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         if: github.ref == 'refs/heads/master' && ${{ matrix.coq_version }} == 'dev'
