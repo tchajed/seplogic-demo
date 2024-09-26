@@ -1,6 +1,6 @@
 -Q src demo
 # Iris-disabled warnings
--arg -w -arg -notation-overridden,-redundant-canonical-projection,-convert_concl_no_check,-undeclared-scope
+-arg -w -arg -redundant-canonical-projection,-unknown-warning,-argument-scope-delimiter,-notation-incompatible-prefix
 
 src/simplified_iris.v
 src/warmup.v

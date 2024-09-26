@@ -22,8 +22,7 @@ jobs:
     strategy:
       matrix:
         coq_version:
-          - "8.18"
-        ocaml_version: ["4.14-flambda"]
+          - "8.19"
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -62,12 +61,11 @@ jobs:
           # skip uninstall since we need docs/ for upload
           uninstall: ""
       - name: Revert permissions
-        # to avoid a warning at cleanup time
         if: ${{ always() }}
         run: sudo chown -R 1001:116 .
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        if: github.ref == 'refs/heads/master' && ${{ matrix.coq_version }} == '8.18'
+        uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/master'
         with:
           path: ./docs
 
@@ -85,4 +83,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
