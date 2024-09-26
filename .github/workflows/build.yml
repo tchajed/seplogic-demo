@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      coq_version: "8.19"
+      coq_version: "8.20"
     steps:
       - uses: actions/checkout@v4
       - uses: coq-community/docker-coq-action@v1
