@@ -32,9 +32,10 @@ jobs:
           install: |
             startGroup Install dependencies
               sudo apt-get update
-              sudo apt-get install -y python3 python3-pip
+              sudo apt-get install -y python3 pipx
               opam install -y coq-serapi
-              python3 -m pip install git+https://github.com/cpitclaudel/alectryon.git
+              pipx install git+https://github.com/cpitclaudel/alectryon.git
+              pipx ensurepath
             endGroup
             startGroup Add Iris repo
               opam repo add iris-dev https://gitlab.mpi-sws.org/iris/opam.git
